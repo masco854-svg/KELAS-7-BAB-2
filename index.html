@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Nilai-Nilai Pancasila - SMP Kelas VII</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .bg-pancasila-gradient {
+            background: linear-gradient(135deg, #b91c1c 0%, #1e3a8a 100%);
+        }
+        
+        .badge-glow {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Board Styling */
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+        }
+
+        .tts-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+        }
+
+        /* Dice Rolling Animation */
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(0.8); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .animate-dice { animation: roll 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased selection:bg-red-500 selection:text-white">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-red-700 text-white shadow-lg sticky top-0 z-40 border-b-4 border-yellow-400">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="bg-yellow-400 p-2 rounded-xl text-red-800 shadow-md flex items-center justify-center">
+                    <i class="fa-solid fa-shield-cat text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-xl leading-tight tracking-wide">PETUALANGAN PANCASILA</h1>
+                    <p class="text-[11px] text-red-100 hidden sm:block">Pendidikan Pancasila Kelas VII / Fase D - Kurikulum Merdeka</p>
+                </div>
+            </div>
+            
+            <!-- XP, LEVEL & AUDIO CONTROLS -->
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <div class="bg-red-900/80 px-3 py-1.5 rounded-xl text-xs md:text-sm font-semibold flex items-center gap-2 border border-red-500/50 shadow-inner">
+                    <i class="fa-solid fa-bolt text-yellow-400 animate-pulse"></i>
+                    <span>XP: <span id="user-xp" class="font-bold text-yellow-300">0</span></span>
+                </div>
+                <div class="bg-amber-400 text-red-950 px-3 py-1.5 rounded-xl text-xs md:text-sm font-black flex items-center gap-1.5 shadow-md border border-amber-300">
+                    <i class="fa-solid fa-trophy text-amber-900"></i>
+                    <span id="user-level">Lvl 1</span>
+                </div>
+                <button id="btn-audio" onclick="toggleAudio()" class="bg-red-800/80 hover:bg-red-600 text-white p-2 rounded-xl text-sm transition border border-red-500/50" title="Audio Sound FX">
+                    <i id="audio-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APPLICATION CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-3 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-4 h-fit sticky top-20">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-red-600"></i> Navigasi utama
+                </h2>
+                <span id="student-name-tag" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-semibold">Siswa</span>
+            </div>
+            
+            <nav class="space-y-1.5" id="main-nav">
+                <button onclick="switchTab('peta')" id="nav-peta" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-between bg-red-50 text-red-700 border border-red-200 shadow-sm transition">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-map-location-dot text-red-600"></i> Peta Petualangan</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button onclick="switchTab('minigames')" id="nav-minigames" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-gamepad text-blue-600"></i> Mini Game Arena</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button onclick="switchTab('materi')" id="nav-materi" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-book-open-reader text-emerald-600"></i> Ringkasan Materi</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button onclick="switchTab('lencana')" id="nav-lencana" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-award text-amber-500"></i> Prestasi & Lencana</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button onclick="switchTab('dashboard-guru')" id="nav-dashboard-guru" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-chalkboard-user text-purple-600"></i> Mode Guru & Data</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </nav>
+
+            <div class="pt-2 border-t border-slate-100 space-y-3">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase block mb-1.5">Profil Siswa</label>
+                    <input type="text" id="input-student-name" onchange="updateStudentName(this.value)" placeholder="Masukkan nama siswa..." class="w-full bg-white border border-slate-300 rounded-lg text-xs p-2 font-medium focus:ring-2 focus:ring-red-500 focus:outline-none">
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase block mb-1.5">Mode Permainan</label>
+                    <select id="game-mode-select" class="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-lg p-2 font-medium focus:ring-2 focus:ring-red-500 focus:outline-none">
+                        <option value="individu">👤 Mode Perorangan / Mandiri</option>
+                        <option value="kelompok">👥 Mode Kelompok / Digital Board</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT SECTION -->
+        <section class="lg:col-span-3 space-y-6">
+
+            <!-- TAB 1: PETA PETUALANGAN ZONA -->
+            <div id="tab-peta" class="tab-content space-y-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-800">Peta Misi Nilai-Nilai Pancasila</h2>
+                        <p class="text-xs text-slate-500 mt-1">Jelajahi 7 zone interaktif untuk mengumpulkan XP, lencana, dan menguasai Bab 2!</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-xl font-bold">
+                        <i class="fa-solid fa-flag-checkered text-amber-600"></i>
+                        <span>Kemajuan Misi: <span id="zone-progress-text">0 / 7 Zona</span></span>
+                    </div>
+                </div>
+
+                <!-- CARDS GRID ZONA 1 - 6 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- ZONA 1 -->
+                    <div class="bg-white border-2 border-amber-300 hover:border-amber-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Zona 1</span>
+                                <i class="fa-solid fa-star text-amber-400 text-sm"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base text-slate-800">Gerbang Pancasila</h3>
+                            <p class="text-xs text-slate-500 mt-1">Dasar Negara, Pandangan Hidup, & Lambang Garuda.</p>
+                        </div>
+                        <button onclick="startZone(1)" class="mt-4 w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <span>Mainkan Ular Tangga</span> <i class="fa-solid fa-play text-[10px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- ZONA 2 -->
+                    <div class="bg-white border-2 border-emerald-300 hover:border-emerald-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Zona 2</span>
+                                <i class="fa-solid fa-hands-praying text-emerald-500 text-sm"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base text-slate-800">Desa Ketuhanan</h3>
+                            <p class="text-xs text-slate-500 mt-1">Sila 1: Toleransi Beragama & Kebebasan Beribadah.</p>
+                        </div>
+                        <button onclick="startZone(2)" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <span>Mainkan Monopoli</span> <i class="fa-solid fa-play text-[10px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- ZONA 3 -->
+                    <div class="bg-white border-2 border-red-300 hover:border-red-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-red-100 text-red-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Zona 3</span>
+                                <i class="fa-solid fa-heart text-red-500 text-sm"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base text-slate-800">Kota Kemanusiaan</h3>
+                            <p class="text-xs text-slate-500 mt-1">Sila 2: Empati, Anti-Bullying, & Hak Asasi Manusia.</p>
+                        </div>
+                        <button onclick="startZone(3)" class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <span>Mainkan TTS Pancasila</span> <i class="fa-solid fa-play text-[10px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- ZONA 4 -->
+                    <div class="bg-white border-2 border-blue-300 hover:border-blue-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Zona 4</span>
+                                <i class="fa-solid fa-people-group text-blue-500 text-sm"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base text-slate-800">Pulau Persatuan</h3>
+                            <p class="text-xs text-slate-500 mt-1">Sila 3: Cinta Tanah Air & Kebinekaan Indonesia.</p>
+                        </div>
+                        <button onclick="startZone(4)" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <span>Mainkan Roda Misi</span> <i class="fa-solid fa-play text-[10px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- ZONA 5 -->
+                    <div class="bg-white border-2 border-purple-300 hover:border-purple-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Zona 5</span>
+                                <i class="fa-solid fa-comments text-purple-500 text-sm"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base text-slate-800">Kota Musyawarah</h3>
+                            <p class="text-xs text-slate-500 mt-1">Sila 4: Demokrasi, Pemilu OSIS, & Musyawarah.</p>
+                        </div>
+                        <button onclick="startZone(5)" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <span>Investigasi Detektif</span> <i class="fa-solid fa-play text-[10px]"></i>
+                        </button>
+                    </div>
+
+                    <!-- ZONA 6 -->
+                    <div class="bg-white border-2 border-teal-300 hover:border-teal-500 rounded-2xl p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="bg-teal-100 text-teal-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">Zona 6</span>
+                                <i class="fa-solid fa-scale-balanced text-teal-500 text-sm"></i>
+                            </div>
+                            <h3 class="font-extrabold text-base text-slate-800">Negeri Keadilan</h3>
+                            <p class="text-xs text-slate-500 mt-1">Sila 5: Hak & Kewajiban, Gotong Royong Seimbang.</p>
+                        </div>
+                        <button onclick="startZone(6)" class="mt-4 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-2">
+                            <span>Battle Quiz</span> <i class="fa-solid fa-play text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ZONA 7 (FINAL BOSS / CROWN MISSION) -->
+                <div class="border-2 border-amber-400 bg-gradient-to-r from-red-700 via-amber-600 to-red-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+                        <div class="space-y-1">
+                            <span class="bg-amber-300 text-red-950 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider shadow">Misi Puncak</span>
+                            <h3 class="text-2xl font-black tracking-wide">ISTANA PELAJAR PANCASILA</h3>
+                            <p class="text-red-100 text-xs max-w-xl">Uji pemahaman komprehensif 5 sila sekaligus dalam studi kasus integratif kehidupan sehari-hari!</p>
+                        </div>
+                        <button onclick="startZone(7)" class="bg-yellow-400 hover:bg-yellow-300 text-red-950 font-extrabold px-6 py-3 rounded-xl shadow-md transition text-sm flex items-center gap-2 whitespace-nowrap">
+                            <i class="fa-solid fa-crown text-amber-700"></i> Tantangan Integratif
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ARENA MINI GAME HUB -->
+            <div id="tab-minigames" class="tab-content hidden space-y-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-extrabold text-slate-800">Arena Mini Game Pancasila</h2>
+                    <p class="text-xs text-slate-500 mt-1">Pilih wahana permainan interaktif untuk melatih pemahaman materi Bab 2.</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                    <div onclick="launchGame('ular-tangga')" class="bg-white p-4 rounded-2xl border-2 border-slate-200 hover:border-red-500 hover:shadow-md cursor-pointer transition text-center space-y-2 group">
+                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto text-red-600 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-dice text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">Ular Tangga Pancasila</h4>
+                        <p class="text-[11px] text-slate-500 leading-snug">Papan 30 petak, dadu interaktif, & kuis sila.</p>
+                    </div>
+
+                    <div onclick="launchGame('monopoli')" class="bg-white p-4 rounded-2xl border-2 border-slate-200 hover:border-blue-500 hover:shadow-md cursor-pointer transition text-center space-y-2 group">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto text-blue-600 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-chess-board text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">Monopoli Pancasila</h4>
+                        <p class="text-[11px] text-slate-500 leading-snug">Jelajahi petak daerah & Kartu Garuda.</p>
+                    </div>
+
+                    <div onclick="launchGame('tts')" class="bg-white p-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-500 hover:shadow-md cursor-pointer transition text-center space-y-2 group">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto text-emerald-600 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-border-all text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">TTS Pancasila</h4>
+                        <p class="text-[11px] text-slate-500 leading-snug">Isi istilah kata kunci nilai-nilai sila.</p>
+                    </div>
+
+                    <div onclick="launchGame('detektif')" class="bg-white p-4 rounded-2xl border-2 border-slate-200 hover:border-purple-500 hover:shadow-md cursor-pointer transition text-center space-y-2 group">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto text-purple-600 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-user-secret text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">Detektif Nilai</h4>
+                        <p class="text-[11px] text-slate-500 leading-snug">Investigasi kasus sosial nyata di sekolah.</p>
+                    </div>
+
+                    <div onclick="launchGame('roda')" class="bg-white p-4 rounded-2xl border-2 border-slate-200 hover:border-amber-500 hover:shadow-md cursor-pointer transition text-center space-y-2 group">
+                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto text-amber-600 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-dharmachakra text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">Roda Misi Pancasila</h4>
+                        <p class="text-[11px] text-slate-500 leading-snug">Putar roda fisik & jawab tantangan acak.</p>
+                    </div>
+
+                    <div onclick="launchGame('battle')" class="bg-white p-4 rounded-2xl border-2 border-slate-200 hover:border-orange-500 hover:shadow-md cursor-pointer transition text-center space-y-2 group">
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto text-orange-600 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-bolt text-2xl"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800">Battle Quiz (2P)</h4>
+                        <p class="text-[11px] text-slate-500 leading-snug">Adu cepat menjawab soal dengan teman/AI.</p>
+                    </div>
+                </div>
+
+                <!-- PLAYGROUND CONTAINER GAME ACTIVE -->
+                <div id="game-playground" class="hidden bg-white rounded-2xl border-2 border-red-500/80 shadow-lg p-4 md:p-6 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-600 animate-ping"></span>
+                            <h3 id="game-title" class="font-black text-lg text-slate-800">Nama Game Active</h3>
+                        </div>
+                        <button onclick="closePlayground()" class="text-slate-400 hover:text-red-600 font-bold text-sm bg-slate-100 hover:bg-red-50 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                            <i class="fa-solid fa-xmark"></i> Tutup Arena
+                        </button>
+                    </div>
+                    
+                    <div id="game-content" class="min-h-[350px] flex flex-col justify-center items-center">
+                        <!-- Dynamic Game View Rendered Here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: RINGKASAN MATERI BAB 2 -->
+            <div id="tab-materi" class="tab-content hidden space-y-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-extrabold text-slate-800">Ringkasan Materi: Bab 2 Pendidikan Pancasila</h2>
+                    <p class="text-xs text-slate-500 mt-1">Penerapan Nilai-Nilai Pancasila dalam Kehidupan Bermasyarakat, Berbangsa, dan Bernegara (Fase D - Kelas VII).</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex items-center gap-3 text-red-700 font-extrabold text-base">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center"><i class="fa-solid fa-monument"></i></div>
+                            <h3>1. Kedudukan Pancasila</h3>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                            <li class="p-2 bg-slate-50 rounded-lg border border-slate-100"><b>Dasar Negara:</b> Pondasi yuridis penyelenggaraan tata hukum & pemerintahan NKRI.</li>
+                            <li class="p-2 bg-slate-50 rounded-lg border border-slate-100"><b>Pandangan Hidup (Weltanschauung):</b> Kompas moral, etika, dan norma dalam bersosialisasi.</li>
+                            <li class="p-2 bg-slate-50 rounded-lg border border-slate-100"><b>Kepribadian Bangsa:</b> Identitas unik berupa gotong royong dan kebersamaan yang membedakan Indonesia.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex items-center gap-3 text-blue-700 font-extrabold text-base">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center"><i class="fa-solid fa-hands-holding-circle"></i></div>
+                            <h3>2. Nilai Substantif 5 Sila</h3>
+                        </div>
+                        <div class="text-xs text-slate-600 space-y-2">
+                            <div class="p-2 bg-amber-50 text-amber-900 rounded-lg border border-amber-200"><b>Sila 1 (Ketuhanan):</b> Kebebasan ibadah, toleransi antarumat, tanpa pemaksaan.</div>
+                            <div class="p-2 bg-emerald-50 text-emerald-900 rounded-lg border border-emerald-200"><b>Sila 2 (Kemanusiaan):</b> Kesetaraan derajat, empati sosial, anti-perundungan.</div>
+                            <div class="p-2 bg-blue-50 text-blue-900 rounded-lg border border-blue-200"><b>Sila 3 (Persatuan):</b> Mengutamakan kepentingan bangsa, cinta produk lokal.</div>
+                            <div class="p-2 bg-purple-50 text-purple-900 rounded-lg border border-purple-200"><b>Sila 4 (Kerakyatan):</b> Musyawarah mufakat, menghargai perbedaan pendapat.</div>
+                            <div class="p-2 bg-teal-50 text-teal-900 rounded-lg border border-teal-200"><b>Sila 5 (Keadilan):</b> Keseimbangan hak & kewajiban, sikap adil, gotong royong.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PRESTASI & LENCANA (BADGES) -->
+            <div id="tab-lencana" class="tab-content hidden space-y-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-extrabold text-slate-800">Koleksi Lencana Pelajar Pancasila</h2>
+                    <p class="text-xs text-slate-500 mt-1">Selesaikan tantangan kuis dan mini game untuk membuka seluruh lencana kehormatan!</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="badges-container">
+                    <!-- Dynamic Badges rendered via JavaScript -->
+                </div>
+            </div>
+
+            <!-- TAB 5: DASHBOARD GURU & REKAP DATA -->
+            <div id="tab-dashboard-guru" class="tab-content hidden space-y-5">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-800">Mode Guru & Analitik Pembelajaran</h2>
+                        <p class="text-xs text-slate-500 mt-1">Pantau akurasi jawaban siswa, unduh laporan CSV, dan kelola kuis kustom.</p>
+                    </div>
+                    <span class="bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1.5 rounded-xl border border-purple-200">
+                        <i class="fa-solid fa-user-shield"></i> Mode Pendidik Active
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                        <p class="text-xs text-slate-500 font-bold uppercase">Total Soal Dijawab</p>
+                        <p id="stat-total-answered" class="text-2xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                        <p class="text-xs text-slate-500 font-bold uppercase">Tingkat Akurasi</p>
+                        <p id="stat-accuracy" class="text-2xl font-black text-emerald-600">0%</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+                        <p class="text-xs text-slate-500 font-bold uppercase">Zona Dikuasai</p>
+                        <p id="stat-zones-completed" class="text-2xl font-black text-blue-600">0 / 7</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-extrabold text-base text-slate-800">Ekspor Laporan & Manajemen Progress</h3>
+                        <button onclick="exportData()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-csv"></i> Unduh Rekap CSV Siswa
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 uppercase font-bold border-b border-slate-200">
+                                    <th class="p-2.5">Waktu</th>
+                                    <th class="p-2.5">Nama Siswa</th>
+                                    <th class="p-2.5">Sila</th>
+                                    <th class="p-2.5">Status</th>
+                                    <th class="p-2.5">XP Didapat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacher-log-table">
+                                <tr>
+                                    <td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada riwayat pengerjaan soal.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex justify-end">
+                        <button onclick="clearStudentProgress()" class="text-red-600 hover:text-red-800 text-xs font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> Reset Kemajuan Siswa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- PEDAGOGICAL FEEDBACK MODAL (REPLACES ALERT) -->
+    <div id="modal-feedback" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all space-y-4 p-6">
+            <div id="feedback-header" class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div id="feedback-icon-bg" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-white shadow-md">
+                    <i id="feedback-icon" class="fa-solid fa-check"></i>
+                </div>
+                <div>
+                    <h3 id="feedback-title" class="font-extrabold text-lg text-slate-800">Jawaban Benar!</h3>
+                    <p id="feedback-subtitle" class="text-xs text-slate-500 font-semibold">+20 XP Berhasil Diperoleh</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-600 block mb-1">Penjelasan Pedagogis:</span>
+                    <p id="feedback-penjelasan" class="text-xs text-slate-700 leading-relaxed font-medium">Penjelasan jawaban di sini...</p>
+                </div>
+
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-center gap-2 text-xs text-amber-900">
+                    <i class="fa-solid fa-lightbulb text-amber-600 text-base"></i>
+                    <span><b>Refleksi Siswa:</b> Terapkan nilai ini dalam interaksi sehari-hari di sekolah!</span>
+                </div>
+            </div>
+
+            <button onclick="closeFeedbackModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs shadow-md transition">
+                Lanjutkan Petualangan <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-800 text-slate-400 text-xs py-4 text-center mt-auto border-t border-slate-700">
+        <p>Media Pembelajaran Interaktif (MPI) Pendidikan Pancasila SMP Kelas VII / Fase D</p>
+        <p class="mt-1 text-slate-500">"Kenali Nilainya, Pahami Maknanya, Terapkan dalam Kehidupan!"</p>
+    </footer>
+
+    <script>
+        let state = {
+            xp: 0,
+            level: 1,
+            audioEnabled: true,
+            mode: 'individu',
+            studentName: 'Siswa VII-A',
+            completedZones: [],
+            badges: [],
+            logs: []
+        };
+
+        // Sound FX Engine via Web Audio API (No External Files Required)
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if(!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playCorrect() {
+                if (!state.audioEnabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            },
+            playWrong() {
+                if (!state.audioEnabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now); // A3
+                osc.frequency.exponentialRampToValueAtTime(130.81, now + 0.2); // C3
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            },
+            playDice() {
+                if (!state.audioEnabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            }
+        };
+
+        const bankSoal = [
+            {
+                id: 1,
+                sila: 1,
+                soal: "Saat jam istirahat, Made hendak melaksanakan ibadah. Sikap toleransi yang sesuai Sila 1 adalah...",
+                pilihan: [
+                    "Mengajaknya bermain bola dulu",
+                    "Menjaga ketenangan di area tempat ibadah",
+                    "Mengikuti Made ke tempat ibadah untuk menonton",
+                    "Bicara keras di depan pintu tempat ibadah"
+                ],
+                kunci: 1,
+                penjelasan: "Sila ke-1 (Ketuhanan Yang Maha Esa) mengharuskan kita menghormati dan memberi ruang kenyamanan bagi pemeluk agama lain dalam beribadah."
+            },
+            {
+                id: 2,
+                sila: 2,
+                soal: "Seorang siswa baru dari luar daerah diejek karena dialek bicaranya unik. Tindakan sesuai Sila 2 adalah...",
+                pilihan: [
+                    "Menegur pembully dan menemani siswa baru tersebut",
+                    "Meminta siswa baru mengubah cara bicaranya",
+                    "Pura-pura tidak tahu agar tidak dimusuhi",
+                    "Ikut tertawa demi keakraban"
+                ],
+                kunci: 0,
+                penjelasan: "Sila ke-2 menjunjung tinggi harkat martabat manusia serta melarang keras segala bentuk diskriminasi dan perundungan (bullying)."
+            },
+            {
+                id: 3,
+                sila: 3,
+                soal: "Dalam pentas seni sekolah, kelas VII menaruh tarian daerah dari seluruh Indonesia. Nilai yang tecermin adalah...",
+                pilihan: [
+                    "Persatuan dalam Kebinekaan",
+                    "Sikap individualistis kelompok",
+                    "Keadilan dalam membagi panggung",
+                    "Kebebasan tanpa aturan"
+                ],
+                kunci: 0,
+                penjelasan: "Sila ke-3 menekankan rasa bangga dan persatuan atas keberagaman kebudayaan Nusantara."
+            },
+            {
+                id: 4,
+                sila: 4,
+                soal: "Saat pemilihan Ketua OSIS, terjadi perbedaan pendapat yang tajam. Solusi sesuai Sila 4 adalah...",
+                pilihan: [
+                    "Mengambil keputusan secara sepihak oleh kepala sekolah",
+                    "Musyawarah mufakat atau pemungutan suara secara jujur",
+                    "Membatalkan pemilihan OSIS",
+                    "Memilih calon berdasarkan popularitas saja"
+                ],
+                kunci: 1,
+                penjelasan: "Sila ke-4 mengutamakan musyawarah untuk mufakat serta nilai demokrasi berkeadaban dalam pengambilan keputusan bersama."
+            },
+            {
+                id: 5,
+                sila: 5,
+                soal: "Siswa melaksanakan piket kelas bersama secara adil sesuai pembagian tugas. Hal ini merupakan wujud...",
+                pilihan: [
+                    "Keseimbangan hak dan kewajiban (Sila 5)",
+                    "Pelanggaran hak pribadi",
+                    "Paksaan wali kelas",
+                    "Sekadar formalitas sekolah"
+                ],
+                kunci: 0,
+                penjelasan: "Sila ke-5 mendorong sikap adil, gotong royong, serta keseimbangan antara menuntut hak dan menunaikan kewajiban."
+            }
+        ];
+
+        const badgeList = [
+            { id: 'b1', title: 'Pionir Garuda', desc: 'Menyelesaikan Zona 1', icon: 'fa-shield-halved', color: 'text-amber-500 bg-amber-50 border-amber-200' },
+            { id: 'b2', title: 'Duta Toleransi', desc: 'Menjawab benar Sila 1', icon: 'fa-hands-praying', color: 'text-emerald-500 bg-emerald-50 border-emerald-200' },
+            { id: 'b3', title: 'Pahlawan Empati', desc: 'Menjawab benar Sila 2', icon: 'fa-heart', color: 'text-red-500 bg-red-50 border-red-200' },
+            { id: 'b4', title: 'Detektif Pancasila', desc: 'Menyelesaikan investigasi kasus', icon: 'fa-user-secret', color: 'text-purple-500 bg-purple-50 border-purple-200' },
+            { id: 'b5', title: 'Master Kuis', desc: 'Mencapai 100+ XP', icon: 'fa-crown', color: 'text-yellow-500 bg-yellow-50 border-yellow-200' }
+        ];
+
+        window.onload = function() {
+            loadLocalStorage();
+            updateUI();
+            renderBadges();
+        };
+
+        function loadLocalStorage() {
+            const saved = localStorage.getItem('pancasila_app_state');
+            if(saved) {
+                try {
+                    state = { ...state, ...JSON.parse(saved) };
+                } catch(e) { console.error(e); }
+            }
+            document.getElementById('input-student-name').value = state.studentName;
+            document.getElementById('student-name-tag').innerText = state.studentName;
+        }
+
+        function saveLocalStorage() {
+            localStorage.setItem('pancasila_app_state', JSON.stringify(state));
+        }
+
+        function updateStudentName(val) {
+            state.studentName = val || 'Siswa VII-A';
+            document.getElementById('student-name-tag').innerText = state.studentName;
+            saveLocalStorage();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-red-50', 'text-red-700', 'border', 'border-red-200', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200', 'shadow-sm');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            if(tabId === 'dashboard-guru') {
+                renderTeacherDashboard();
+            }
+            closePlayground();
+        }
+
+        function addXP(amount, silaTag = 1) {
+            state.xp += amount;
+            
+            // Check Level Up
+            const newLevel = Math.floor(state.xp / 100) + 1;
+            if(newLevel > state.level) {
+                state.level = newLevel;
+                unlockBadge('b5');
+            }
+
+            // Unlock specific Sila Badges
+            if(silaTag === 1) unlockBadge('b2');
+            if(silaTag === 2) unlockBadge('b3');
+
+            updateUI();
+            saveLocalStorage();
+        }
+
+        function unlockBadge(badgeId) {
+            if(!state.badges.includes(badgeId)) {
+                state.badges.push(badgeId);
+                renderBadges();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('user-xp').innerText = state.xp;
+            document.getElementById('user-level').innerText = `Lvl ${state.level}`;
+            document.getElementById('zone-progress-text').innerText = `${state.completedZones.length} / 7 Zona`;
+        }
+
+        function renderBadges() {
+            const container = document.getElementById('badges-container');
+            container.innerHTML = badgeList.map(b => {
+                const isUnlocked = state.badges.includes(b.id);
+                return `
+                    <div class="p-4 rounded-2xl border ${isUnlocked ? b.color : 'bg-slate-100 border-slate-200 opacity-50'} text-center space-y-2 transition">
+                        <i class="fa-solid ${b.icon} text-3xl mb-1 ${isUnlocked ? '' : 'text-slate-400'}"></i>
+                        <h4 class="font-extrabold text-xs text-slate-800">${b.title}</h4>
+                        <p class="text-[10px] text-slate-500">${b.desc}</p>
+                        <span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full ${isUnlocked ? 'bg-amber-400 text-slate-900' : 'bg-slate-200 text-slate-500'} uppercase">
+                            ${isUnlocked ? 'Terbuka' : 'Terkunci'}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showFeedbackModal(isCorrect, textPenjelasan, xpEarned) {
+            const modal = document.getElementById('modal-feedback');
+            const iconBg = document.getElementById('feedback-icon-bg');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const subtitle = document.getElementById('feedback-subtitle');
+            const penjelasan = document.getElementById('feedback-penjelasan');
+
+            penjelasan.innerText = textPenjelasan;
+
+            if(isCorrect) {
+                AudioFX.playCorrect();
+                iconBg.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-white shadow-md bg-emerald-500";
+                icon.className = "fa-solid fa-check";
+                title.innerText = "Jawaban Tepat! 🎉";
+                title.className = "font-extrabold text-lg text-emerald-700";
+                subtitle.innerText = `+${xpEarned} XP Berhasil Ditambahkan`;
+            } else {
+                AudioFX.playWrong();
+                iconBg.className = "w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-white shadow-md bg-red-500";
+                icon.className = "fa-solid fa-xmark";
+                title.innerText = "Belum Tepat!";
+                title.className = "font-extrabold text-lg text-red-700";
+                subtitle.innerText = "Pelajari penjelasan berikut untuk mencoba lagi";
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('modal-feedback').classList.add('hidden');
+        }
+
+        function launchGame(gameType) {
+            switchTab('minigames');
+            const playground = document.getElementById('game-playground');
+            const title = document.getElementById('game-title');
+            const content = document.getElementById('game-content');
+            
+            playground.classList.remove('hidden');
+
+            if(gameType === 'ular-tangga') {
+                title.innerText = '🎮 Ular Tangga Pancasila';
+                renderUlarTangga(content);
+            } else if(gameType === 'monopoli') {
+                title.innerText = '🎲 Monopoli Pancasila';
+                renderMonopoli(content);
+            } else if(gameType === 'tts') {
+                title.innerText = '🧩 Teka-Teki Silang (TTS) Pancasila';
+                renderTTS(content);
+            } else if(gameType === 'detektif') {
+                title.innerText = '🕵️ Detektif Nilai Pancasila';
+                renderDetektif(content);
+            } else if(gameType === 'roda') {
+                title.innerText = '🎡 Roda Misi Pancasila';
+                renderRoda(content);
+            } else if(gameType === 'battle') {
+                title.innerText = '⚡ Battle Quiz 2-Player';
+                renderBattle(content);
+            }
+        }
+
+        function closePlayground() {
+            document.getElementById('game-playground').classList.add('hidden');
+        }
+
+        function startZone(zoneNum) {
+            if(!state.completedZones.includes(zoneNum)) {
+                state.completedZones.push(zoneNum);
+                if(zoneNum === 1) unlockBadge('b1');
+                updateUI();
+                saveLocalStorage();
+            }
+            if(zoneNum === 1) launchGame('ular-tangga');
+            else if(zoneNum === 2) launchGame('monopoli');
+            else if(zoneNum === 3) launchGame('tts');
+            else if(zoneNum === 4) launchGame('roda');
+            else if(zoneNum === 5) launchGame('detektif');
+            else if(zoneNum === 6) launchGame('battle');
+            else launchGame('detektif');
+        }
+
+        let utPos = 1;
+        function renderUlarTangga(container) {
+            container.innerHTML = `
+                <div class="w-full max-w-xl space-y-4">
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border">
+                        <span class="text-xs font-bold text-slate-700">Posisi Bidak: <b id="ut-pos-text" class="text-red-600">Petak ${utPos}</b> / 30</span>
+                        <button onclick="rollUlarTanggaDice()" id="btn-ut-dice" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition flex items-center gap-2">
+                            <i class="fa-solid fa-dice text-lg"></i> Lempar Dadu
+                        </button>
+                    </div>
+
+                    <!-- Board Grid 6x5 = 30 Tiles -->
+                    <div class="board-grid bg-slate-200 p-2 rounded-2xl border-2 border-slate-300" id="ut-board">
+                        ${Array.from({length: 30}, (_, i) => 30 - i).map(num => `
+                            <div id="ut-tile-${num}" class="h-12 md:h-14 bg-white rounded-lg border border-slate-200 flex flex-col justify-between p-1 relative text-[10px] font-bold text-slate-500">
+                                <span>${num}</span>
+                                ${num === utPos ? '<div id="ut-pawn" class="w-5 h-5 bg-red-600 text-white rounded-full mx-auto flex items-center justify-center text-[10px] shadow-md animate-bounce"><i class="fa-solid fa-chess-pawn"></i></div>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div id="ut-question-box" class="hidden bg-red-50 p-4 rounded-2xl border border-red-200 space-y-3">
+                        <span class="text-[10px] font-bold uppercase text-red-700">Tantangan Kuis Petak!</span>
+                        <p id="ut-q-text" class="text-xs font-bold text-slate-800"></p>
+                        <div id="ut-q-options" class="space-y-1.5"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function rollUlarTanggaDice() {
+            AudioFX.playDice();
+            const dice = Math.floor(Math.random() * 6) + 1;
+            utPos = Math.min(30, utPos + dice);
+            
+            // Snakes and Ladders shortcuts
+            if(utPos === 5) utPos = 12; // Ladder
+            if(utPos === 18) utPos = 8; // Snake
+            
+            renderUlarTangga(document.getElementById('game-content'));
+            
+            // Show question
+            const q = bankSoal[Math.floor(Math.random() * bankSoal.length)];
+            const qBox = document.getElementById('ut-question-box');
+            const qText = document.getElementById('ut-q-text');
+            const qOpt = document.getElementById('ut-q-options');
+
+            qText.innerText = q.soal;
+            qOpt.innerHTML = q.pilihan.map((p, idx) => `
+                <button onclick="answerUlarTanggaQuestion(${idx === q.kunci}, '${q.penjelasan.replace(/'/g, "\\'")}', ${q.sila})" class="w-full text-left p-2 rounded-xl bg-white hover:bg-red-100 border text-xs font-medium transition">
+                    ${p}
+                </button>
+            `).join('');
+
+            qBox.classList.remove('hidden');
+        }
+
+        function answerUlarTanggaQuestion(isCorrect, penjelasan, sila) {
+            logStudentAnswer(sila, isCorrect);
+            if(isCorrect) {
+                addXP(20, sila);
+                showFeedbackModal(true, penjelasan, 20);
+            } else {
+                utPos = Math.max(1, utPos - 2); // Penalty back 2 spaces
+                showFeedbackModal(false, penjelasan, 0);
+            }
+            renderUlarTangga(document.getElementById('game-content'));
+        }
+
+        function renderMonopoli(container) {
+            container.innerHTML = `
+                <div class="w-full max-w-lg space-y-4 text-center">
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-2xl">
+                        <i class="fa-solid fa-chess-board text-4xl text-blue-600 mb-2"></i>
+                        <h4 class="font-bold text-sm text-blue-950">Monopoli Karakter Pancasila</h4>
+                        <p class="text-xs text-slate-600 mt-1">Ambil Kartu Tantangan Garuda untuk menjelajahi nilai-nilai 5 Sila!</p>
+                    </div>
+
+                    <button onclick="drawMonopolyCard()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl text-xs shadow-md transition inline-flex items-center gap-2">
+                        <i class="fa-solid fa-note-sticky"></i> Tarik Kartu Garuda
+                    </button>
+
+                    <div id="monopoly-card-display" class="hidden bg-white p-5 rounded-2xl border-2 border-blue-400 shadow-md text-left space-y-3">
+                        <span class="text-[10px] font-black uppercase text-blue-600">Kartu Tantangan Garuda</span>
+                        <p id="mono-q-text" class="text-xs font-bold text-slate-800"></p>
+                        <div id="mono-q-options" class="space-y-2"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function drawMonopolyCard() {
+            AudioFX.playDice();
+            const q = bankSoal[Math.floor(Math.random() * bankSoal.length)];
+            const display = document.getElementById('monopoly-card-display');
+            document.getElementById('mono-q-text').innerText = q.soal;
+            
+            document.getElementById('mono-q-options').innerHTML = q.pilihan.map((p, idx) => `
+                <button onclick="answerMonopolyQuestion(${idx === q.kunci}, '${q.penjelasan.replace(/'/g, "\\'")}', ${q.sila})" class="w-full text-left p-2.5 rounded-xl border border-slate-200 hover:bg-blue-50 text-xs font-medium transition">
+                    ${p}
+                </button>
+            `).join('');
+
+            display.classList.remove('hidden');
+        }
+
+        function answerMonopolyQuestion(isCorrect, penjelasan, sila) {
+            logStudentAnswer(sila, isCorrect);
+            if(isCorrect) {
+                addXP(25, sila);
+                showFeedbackModal(true, penjelasan, 25);
+            } else {
+                showFeedbackModal(false, penjelasan, 0);
+            }
+            document.getElementById('monopoly-card-display').classList.add('hidden');
+        }
+
+        function renderTTS(container) {
+            container.innerHTML = `
+                <div class="w-full max-w-md space-y-4">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-emerald-800">Isi Kata Kunci Pancasila (Mendatar: SILA, Menurun: GARUDA)</span>
+                    </div>
+
+                    <div class="tts-grid bg-slate-300 p-2 rounded-2xl max-w-[280px] mx-auto">
+                        <!-- Simple 4x4 Grid Demo -->
+                        <input id="tts-0" maxlength="1" class="w-8 h-8 text-center uppercase font-black border rounded bg-white" uppercase font-black text-xs>
+                        <input id="tts-1" maxlength="1" class="w-8 h-8 text-center uppercase font-black border rounded bg-white text-xs">
+                        <input id="tts-2" maxlength="1" class="w-8 h-8 text-center uppercase font-black border rounded bg-white text-xs">
+                        <input id="tts-3" maxlength="1" class="w-8 h-8 text-center uppercase font-black border rounded bg-white text-xs">
+                        
+                        <input id="tts-4" maxlength="1" class="w-8 h-8 text-center uppercase font-black border rounded bg-white text-xs">
+                        <div class="w-8 h-8 bg-slate-400 rounded"></div>
+                        <div class="w-8 h-8 bg-slate-400 rounded"></div>
+                        <div class="w-8 h-8 bg-slate-400 rounded"></div>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 text-center">Petunjuk 1 Mendatar: Dasar hukum dan moral bangsa Indonesia (4 Huruf: S-I-L-A)</p>
+
+                    <button onclick="checkTTS()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+                        Periksa Jawaban TTS
+                    </button>
+                </div>
+            `;
+        }
+
+        function checkTTS() {
+            const v0 = (document.getElementById('tts-0').value || '').toUpperCase();
+            const v1 = (document.getElementById('tts-1').value || '').toUpperCase();
+            const v2 = (document.getElementById('tts-2').value || '').toUpperCase();
+            const v3 = (document.getElementById('tts-3').value || '').toUpperCase();
+
+            if(v0 === 'S' && v1 === 'I' && v2 === 'L' && v3 === 'A') {
+                addXP(30, 1);
+                logStudentAnswer(1, true);
+                showFeedbackModal(true, "Tepat Sekali! Kata SILA merupakan pedoman nilai moral utama dasar negara Indonesia.", 30);
+            } else {
+                logStudentAnswer(1, false);
+                showFeedbackModal(false, "Coba periksa kembali huruf yang kamu masukkan. Petunjuknya adalah S-I-L-A.", 0);
+            }
+        }
+
+        function renderDetektif(container) {
+            container.innerHTML = `
+                <div class="w-full max-w-lg space-y-4 text-left">
+                    <div class="bg-purple-50 p-4 rounded-2xl border border-purple-200">
+                        <span class="text-[10px] font-black uppercase text-purple-700">Berkas Investigasi Kasus #102</span>
+                        <h4 class="font-extrabold text-sm text-slate-800 mt-1">Laporan Diskriminasi di Kelas VII-C</h4>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">Saat pembentukan kelompok belajar, seorang siswa berkebutuhan khusus sengaja ditolak dan ditinggalkan tanpa kelompok.</p>
+                    </div>
+
+                    <p class="font-bold text-xs text-slate-700">Analisis Detektif: Sila manakah yang dilanggar dan apa solusi terbaiknya?</p>
+
+                    <div class="space-y-2">
+                        <button onclick="answerDetektif(true, 'Kasus ini melanggar Sila ke-2 (Kemanusiaan yang Adil dan Beradab) karena setiap manusia berhak atas perlakuan yang setara tanpa diskriminasi.')" class="w-full text-left p-3 rounded-xl border border-slate-200 hover:bg-purple-50 text-xs font-medium transition">
+                            A. Sila 2: Mengajaknya masuk kelompok & memberikan pendampingan bersama.
+                        </button>
+                        <button onclick="answerDetektif(false, 'Membiarkannya menyalahi prinsip keadilan dan kemanusiaan Sila ke-2.')" class="w-full text-left p-3 rounded-xl border border-slate-200 hover:bg-purple-50 text-xs font-medium transition">
+                            B. Sila 3: Membiarkannya mengerjakan tugas sendirian.
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function answerDetektif(isCorrect, penjelasan) {
+            logStudentAnswer(2, isCorrect);
+            if(isCorrect) {
+                addXP(30, 2);
+                unlockBadge('b4');
+                showFeedbackModal(true, penjelasan, 30);
+            } else {
+                showFeedbackModal(false, penjelasan, 0);
+            }
+        }
+
+        function renderRoda(container) {
+            container.innerHTML = `
+                <div class="w-full max-w-sm space-y-4 text-center">
+                    <canvas id="wheel-canvas" width="260" height="260" class="mx-auto rounded-full border-4 border-amber-400 shadow-md"></canvas>
+                    <button onclick="spinWheel()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow transition">
+                        <i class="fa-solid fa-dharmachakra"></i> Putar Roda Misi
+                    </button>
+                </div>
+            `;
+            drawWheel();
+        }
+
+        function drawWheel() {
+            const cvs = document.getElementById('wheel-canvas');
+            if(!cvs) return;
+            const ctx = cvs.getContext('2d');
+            const colors = ['#ef4444', '#10b981', '#3b82f6', '#a855f7', '#14b8a6'];
+            const labels = ['Sila 1', 'Sila 2', 'Sila 3', 'Sila 4', 'Sila 5'];
+
+            for(let i=0; i<5; i++) {
+                ctx.beginPath();
+                ctx.fillStyle = colors[i];
+                ctx.moveTo(130, 130);
+                ctx.arc(130, 130, 120, (i * 72 * Math.PI) / 180, ((i + 1) * 72 * Math.PI) / 180);
+                ctx.fill();
+
+                ctx.save();
+                ctx.translate(130, 130);
+                ctx.rotate(((i * 72 + 36) * Math.PI) / 180);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(labels[i], 50, 4);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            AudioFX.playDice();
+            const q = bankSoal[Math.floor(Math.random() * bankSoal.length)];
+            setTimeout(() => {
+                showFeedbackModal(true, `Roda berhenti di Sila ${q.sila}! Pertanyaan: ${q.soal} -> ${q.penjelasan}`, 15);
+                addXP(15, q.sila);
+            }, 600);
+        }
+
+        function renderBattle(container) {
+            const q = bankSoal[Math.floor(Math.random() * bankSoal.length)];
+            container.innerHTML = `
+                <div class="w-full max-w-lg space-y-4 text-center">
+                    <div class="flex justify-between items-center bg-orange-50 p-3 rounded-2xl border border-orange-200">
+                        <span class="font-bold text-xs text-orange-900">Player 1 (Siswa)</span>
+                        <span class="font-black text-sm text-red-600">VS</span>
+                        <span class="font-bold text-xs text-slate-700">Player 2 (AI/Teman)</span>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border text-left space-y-2">
+                        <p class="font-bold text-xs text-slate-800">${q.soal}</p>
+                        <div class="space-y-1.5">
+                            ${q.pilihan.map((p, idx) => `
+                                <button onclick="answerBattle(${idx === q.kunci}, '${q.penjelasan.replace(/'/g, "\\'")}', ${q.sila})" class="w-full text-left p-2 rounded-xl border hover:bg-orange-50 text-xs transition">
+                                    ${p}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function answerBattle(isCorrect, penjelasan, sila) {
+            logStudentAnswer(sila, isCorrect);
+            if(isCorrect) {
+                addXP(25, sila);
+                showFeedbackModal(true, `Kemenangan Battle Quiz! ${penjelasan}`, 25);
+            } else {
+                showFeedbackModal(false, penjelasan, 0);
+            }
+        }
+
+        function logStudentAnswer(sila, isCorrect) {
+            state.logs.unshift({
+                timestamp: new Date().toLocaleTimeString(),
+                name: state.studentName,
+                sila: `Sila ${sila}`,
+                status: isCorrect ? 'Benar' : 'Salah',
+                xp: isCorrect ? 20 : 0
+            });
+            saveLocalStorage();
+        }
+
+        function renderTeacherDashboard() {
+            const table = document.getElementById('teacher-log-table');
+            const totalAns = state.logs.length;
+            const correctAns = state.logs.filter(l => l.status === 'Benar').length;
+            const accuracy = totalAns > 0 ? Math.round((correctAns / totalAns) * 100) : 0;
+
+            document.getElementById('stat-total-answered').innerText = totalAns;
+            document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
+            document.getElementById('stat-zones-completed').innerText = `${state.completedZones.length} / 7`;
+
+            if(state.logs.length === 0) {
+                table.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada riwayat pengerjaan soal.</td></tr>`;
+                return;
+            }
+
+            table.innerHTML = state.logs.map(l => `
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="p-2.5 text-slate-500">${l.timestamp}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${l.name}</td>
+                    <td class="p-2.5">${l.sila}</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${l.status === 'Benar' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">${l.status}</span></td>
+                    <td class="p-2.5 font-bold text-amber-600">+${l.xp} XP</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportData() {
+            let csvContent = "data:text/csv;charset=utf-8,Waktu,Nama Siswa,Sila,Status,XP\n";
+            state.logs.forEach(l => {
+                csvContent += `${l.timestamp},${l.name},${l.sila},${l.status},${l.xp}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `rekap_pancasila_${state.studentName.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function clearStudentProgress() {
+            state.xp = 0;
+            state.level = 1;
+            state.completedZones = [];
+            state.badges = [];
+            state.logs = [];
+            saveLocalStorage();
+            updateUI();
+            renderBadges();
+            renderTeacherDashboard();
+        }
+
+        function toggleAudio() {
+            state.audioEnabled = !state.audioEnabled;
+            document.getElementById('audio-icon').className = state.audioEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+        }
+    </script>
+</body>
+</html>
